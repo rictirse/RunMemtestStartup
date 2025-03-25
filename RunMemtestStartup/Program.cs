@@ -21,14 +21,37 @@ static void CopyRuntime(string exportPath)
     var runtimePath = Path.Combine(exportPath, "runtimes", "win", "lib", "net8.0");
     runtimePath.SafeCreate();
 
-    const string systemManagement = "System.Management.dll";
+    const string systemManagement = "System.Management.dll_";
     var systemManagementPath = Path.Combine(runtimePath, systemManagement);
     var fi_systemManagement = new FileInfo(systemManagementPath);
     if (!fi_systemManagement.Exists)
     {
         systemManagementPath = Path.Combine(exportPath, systemManagement);
         var fi = new FileInfo(systemManagementPath);
-        fi.CopyTo(fi_systemManagement.FullName);
+        fi.CopyTo(fi_systemManagement.FullName[0..^1], true);
+    }
+
+    const string systemEvents = "Microsoft.Win32.SystemEvents.dll_";
+    var systemEventsPath = Path.Combine(runtimePath, systemEvents);
+    var fi_systemEvents = new FileInfo(systemEventsPath);
+    if (!fi_systemEvents.Exists)
+    {
+        systemEventsPath = Path.Combine(exportPath, systemEvents);
+        var fi = new FileInfo(systemEventsPath);
+        fi.CopyTo(fi_systemEvents.FullName[0..^1], true);
+    }
+
+    runtimePath = Path.Combine(exportPath, "runtimes", "browser", "lib", "net8.0");
+    runtimePath.SafeCreate();
+
+    const string encodingsWeb = "System.Text.Encodings.Web.dll_";
+    var encodingsWebPath = Path.Combine(runtimePath, encodingsWeb);
+    var fi_encodingsWeb = new FileInfo(encodingsWebPath);
+    if (!fi_encodingsWeb.Exists)
+    {
+        encodingsWebPath = Path.Combine(exportPath, encodingsWeb);
+        var fi = new FileInfo(encodingsWebPath);
+        fi.CopyTo(fi_encodingsWeb.FullName[0..^1], true);
     }
 }
 

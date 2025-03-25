@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "RunMemtest/20241130": {
+      "RunMemtest/20250325": {
         "dependencies": {
           "Microsoft.Extensions.Configuration": "9.0.0",
           "Microsoft.Extensions.Configuration.Json": "9.0.0",
@@ -339,7 +339,7 @@
     }
   },
   "libraries": {
-    "RunMemtest/20241130": {
+    "RunMemtest/20250325": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

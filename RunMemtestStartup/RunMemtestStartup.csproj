@@ -16,7 +16,8 @@
 		<ProjectStartedDate>$([System.DateTime]::op_Subtraction($([System.DateTime]::get_Now().get_Date()),$([System.DateTime]::new(2013,2,28))).get_TotalDays())</ProjectStartedDate>
 		<DaysSinceProjectStarted>$([System.DateTime]::Now.ToString(Hmm))</DaysSinceProjectStarted>
 		<DateTimeSuffix>$([System.DateTime]::Now.ToString(yyyyMMdd))</DateTimeSuffix>
-		<VersionSuffix>$(Major).$(Minor).$(ProjectStartedDate).$(DaysSinceProjectStarted)</VersionSuffix>
+		<VersionSuffix>6.0.4404.0</VersionSuffix>
+		<!--<VersionSuffix>$(Major).$(Minor).$(ProjectStartedDate).$(DaysSinceProjectStarted)</VersionSuffix>-->
 		<AssemblyVersion Condition=" '$(DateTimeSuffix)' == '' ">0.0.0.1</AssemblyVersion>
 		<AssemblyVersion Condition=" '$(DateTimeSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
 		<Version Condition=" '$(DateTimeSuffix)' == '' ">0.0.0.1</Version>
@@ -40,6 +41,8 @@
 	  <None Remove="Package\Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
 	  <None Remove="Package\Microsoft.Extensions.Options.dll" />
 	  <None Remove="Package\Microsoft.Extensions.Primitives.dll" />
+	  <None Remove="Package\Microsoft.Win32.SystemEvents.dll" />
+	  <None Remove="Package\Microsoft.Win32.SystemEvents.dll_" />
 	  <None Remove="Package\NLog.dll" />
 	  <None Remove="Package\NLog.Extensions.Logging.dll" />
 	  <None Remove="Package\RunMemtest.deps.json" />
@@ -51,8 +54,10 @@
 	  <None Remove="Package\System.Drawing.Common.dll" />
 	  <None Remove="Package\System.IO.Pipelines.dll" />
 	  <None Remove="Package\System.Management.dll" />
+	  <None Remove="Package\System.Management.dll_" />
 	  <None Remove="Package\System.Private.Windows.Core.dll" />
 	  <None Remove="Package\System.Text.Encodings.Web.dll" />
+	  <None Remove="Package\System.Text.Encodings.Web.dll_" />
 	  <None Remove="Package\System.Text.Json.dll" />
 	</ItemGroup>
 
@@ -73,6 +78,8 @@
 	  <EmbeddedResource Include="Package\Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
 	  <EmbeddedResource Include="Package\Microsoft.Extensions.Options.dll" />
 	  <EmbeddedResource Include="Package\Microsoft.Extensions.Primitives.dll" />
+	  <EmbeddedResource Include="Package\Microsoft.Win32.SystemEvents.dll" />
+	  <EmbeddedResource Include="Package\Microsoft.Win32.SystemEvents.dll_" />
 	  <EmbeddedResource Include="Package\NLog.dll" />
 	  <EmbeddedResource Include="Package\NLog.Extensions.Logging.dll" />
 	  <EmbeddedResource Include="Package\RunMemtest.deps.json" />
@@ -84,8 +91,10 @@
 	  <EmbeddedResource Include="Package\System.Drawing.Common.dll" />
 	  <EmbeddedResource Include="Package\System.IO.Pipelines.dll" />
 	  <EmbeddedResource Include="Package\System.Management.dll" />
+	  <EmbeddedResource Include="Package\System.Management.dll_" />
 	  <EmbeddedResource Include="Package\System.Private.Windows.Core.dll" />
 	  <EmbeddedResource Include="Package\System.Text.Encodings.Web.dll" />
+	  <EmbeddedResource Include="Package\System.Text.Encodings.Web.dll_" />
 	  <EmbeddedResource Include="Package\System.Text.Json.dll" />
 	</ItemGroup>
 
