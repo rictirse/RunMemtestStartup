@@ -5,7 +5,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<ApplicationIcon>D:\Code\RunMemtest\RunMemtest\RunMemtest\NewDang.ico</ApplicationIcon>
+		<ApplicationIcon>NewDang.ico</ApplicationIcon>
 		<Company>DangWang</Company>
 		<Authors>DangWang</Authors>
 	</PropertyGroup>
