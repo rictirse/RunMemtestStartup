@@ -1,5 +1,7 @@
 # RunMemtestPro
 
+![RunMemtestPro](docs/cover.png)
+
 **English** | [中文](#中文)
 
 **RunMemtestPro** is a memory burn-in tool that runs many MemTest instances at once, fills free memory automatically, and shows coverage, errors and memory details in one window.
