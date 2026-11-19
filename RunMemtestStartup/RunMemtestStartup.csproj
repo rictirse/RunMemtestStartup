@@ -10,98 +10,29 @@
 		<Authors>DangWang</Authors>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<Major>6</Major>
-		<Minor>0</Minor>
-		<ProjectStartedDate>$([System.DateTime]::op_Subtraction($([System.DateTime]::get_Now().get_Date()),$([System.DateTime]::new(2013,2,28))).get_TotalDays())</ProjectStartedDate>
-		<DaysSinceProjectStarted>$([System.DateTime]::Now.ToString(Hmm))</DaysSinceProjectStarted>
-		<DateTimeSuffix>$([System.DateTime]::Now.ToString(yyyyMMdd))</DateTimeSuffix>
-		<VersionSuffix>6.0.4404.0</VersionSuffix>
-		<!--<VersionSuffix>$(Major).$(Minor).$(ProjectStartedDate).$(DaysSinceProjectStarted)</VersionSuffix>-->
-		<AssemblyVersion Condition=" '$(DateTimeSuffix)' == '' ">0.0.0.1</AssemblyVersion>
-		<AssemblyVersion Condition=" '$(DateTimeSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
-		<Version Condition=" '$(DateTimeSuffix)' == '' ">0.0.0.1</Version>
-		<Version Condition=" '$(DateTimeSuffix)' != '' ">$(DateTimeSuffix)</Version>
+	<!-- Version: passed in by the release script, e.g. -p:ReleaseVersion=6.0.4645.1530
+	     (same version as RunMemtest). Local builds without it get 0.0.0.1. -->
+	<PropertyGroup>
+		<ReleaseVersion Condition=" '$(ReleaseVersion)' == '' ">0.0.0.1</ReleaseVersion>
+		<AssemblyVersion>$(ReleaseVersion)</AssemblyVersion>
+		<FileVersion>$(ReleaseVersion)</FileVersion>
+		<Version>$(ReleaseVersion)</Version>
 	</PropertyGroup>
 
+	<!-- Package/: RunMemtest build output, copied in by the release script (not in git).
+	     Every file is embedded with its relative path kept, so the launcher can restore
+	     the folder layout (e.g. runtimes\win\lib\net8.0\...). -->
 	<ItemGroup>
-	  <None Remove="Package\Microsoft.Extensions.Configuration.Abstractions.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Configuration.Binder.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Configuration.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Configuration.FileExtensions.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Configuration.Json.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Configuration.UserSecrets.dll" />
-	  <None Remove="Package\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-	  <None Remove="Package\Microsoft.Extensions.DependencyInjection.dll" />
-	  <None Remove="Package\Microsoft.Extensions.FileProviders.Abstractions.dll" />
-	  <None Remove="Package\Microsoft.Extensions.FileProviders.Physical.dll" />
-	  <None Remove="Package\Microsoft.Extensions.FileSystemGlobbing.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Logging.Abstractions.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Logging.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Options.dll" />
-	  <None Remove="Package\Microsoft.Extensions.Primitives.dll" />
-	  <None Remove="Package\Microsoft.Win32.SystemEvents.dll" />
-	  <None Remove="Package\Microsoft.Win32.SystemEvents.dll_" />
-	  <None Remove="Package\NLog.dll" />
-	  <None Remove="Package\NLog.Extensions.Logging.dll" />
-	  <None Remove="Package\RunMemtest.deps.json" />
-	  <None Remove="Package\RunMemtest.dll" />
-	  <None Remove="Package\RunMemtest.exe" />
-	  <None Remove="Package\RunMemtest.runtimeconfig.json" />
-	  <None Remove="Package\System.CodeDom.dll" />
-	  <None Remove="Package\System.Diagnostics.DiagnosticSource.dll" />
-	  <None Remove="Package\System.Drawing.Common.dll" />
-	  <None Remove="Package\System.IO.Pipelines.dll" />
-	  <None Remove="Package\System.Management.dll" />
-	  <None Remove="Package\System.Management.dll_" />
-	  <None Remove="Package\System.Private.Windows.Core.dll" />
-	  <None Remove="Package\System.Text.Encodings.Web.dll" />
-	  <None Remove="Package\System.Text.Encodings.Web.dll_" />
-	  <None Remove="Package\System.Text.Json.dll" />
+		<None Remove="Package\**" />
+		<Compile Remove="Package\**" />
+		<Content Remove="Package\**" />
+		<EmbeddedResource Include="Package\**\*" LogicalName="Package/%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Configuration.Abstractions.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Configuration.Binder.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Configuration.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Configuration.FileExtensions.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Configuration.Json.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Configuration.UserSecrets.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.DependencyInjection.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.FileProviders.Abstractions.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.FileProviders.Physical.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.FileSystemGlobbing.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Logging.Abstractions.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Logging.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Options.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Extensions.Primitives.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Win32.SystemEvents.dll" />
-	  <EmbeddedResource Include="Package\Microsoft.Win32.SystemEvents.dll_" />
-	  <EmbeddedResource Include="Package\NLog.dll" />
-	  <EmbeddedResource Include="Package\NLog.Extensions.Logging.dll" />
-	  <EmbeddedResource Include="Package\RunMemtest.deps.json" />
-	  <EmbeddedResource Include="Package\RunMemtest.dll" />
-	  <EmbeddedResource Include="Package\RunMemtest.exe" />
-	  <EmbeddedResource Include="Package\RunMemtest.runtimeconfig.json" />
-	  <EmbeddedResource Include="Package\System.CodeDom.dll" />
-	  <EmbeddedResource Include="Package\System.Diagnostics.DiagnosticSource.dll" />
-	  <EmbeddedResource Include="Package\System.Drawing.Common.dll" />
-	  <EmbeddedResource Include="Package\System.IO.Pipelines.dll" />
-	  <EmbeddedResource Include="Package\System.Management.dll" />
-	  <EmbeddedResource Include="Package\System.Management.dll_" />
-	  <EmbeddedResource Include="Package\System.Private.Windows.Core.dll" />
-	  <EmbeddedResource Include="Package\System.Text.Encodings.Web.dll" />
-	  <EmbeddedResource Include="Package\System.Text.Encodings.Web.dll_" />
-	  <EmbeddedResource Include="Package\System.Text.Json.dll" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="appsettings.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

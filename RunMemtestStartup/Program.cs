@@ -1,143 +1,100 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-const string RunMemtest = nameof(RunMemtest);
+using System.Security.Cryptography;
+using System.Text;
 
-var exportPath = BuildExportPath();
-Export(exportPath);
-CopyRuntime(exportPath);
-StartMemtest(exportPath);
+// RunMemtest launcher:
+// extracts the embedded package (Package/**) to %TEMP%\RunMemtest\<version>-<content hash>
+// and starts RunMemtest.exe with the launcher's working directory as argument
+// (RunMemtest reads/writes appsettings.json and screenshots there).
 
-static string BuildExportPath()
+const string AppName = "RunMemtest";
+const string ResourcePrefix = "Package/";
+const string CompleteMarker = ".extracted";
+
+var assembly = Assembly.GetExecutingAssembly();
+var resources = assembly.GetManifestResourceNames()
+    .Where(name => name.StartsWith(ResourcePrefix, StringComparison.Ordinal))
+    .OrderBy(name => name, StringComparer.Ordinal)
+    .ToArray();
+
+if (resources.Length == 0)
 {
-    var assemblyVersion = $"{FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}";
-    var exportPath = Path.Combine(Path.GetTempPath(), RunMemtest, assemblyVersion);
-    exportPath.SafeCreate();
+    Console.WriteLine("No package is embedded in this build.");
+    return 1;
+}
 
+var exportPath = BuildExportPath(assembly, resources);
+
+// An interrupted extraction leaves no marker, so it is extracted again.
+if (!File.Exists(Path.Combine(exportPath, CompleteMarker)))
+{
+    Export(assembly, resources, exportPath);
+}
+
+StartMemtest(exportPath);
+return 0;
+
+static string BuildExportPath(Assembly assembly, string[] resources)
+{
+    var version = FileVersionInfo.GetVersionInfo(assembly.Location).FileVersion ?? "0.0.0.0";
+    // Content hash: a rebuilt package with an unchanged version never reuses old files.
+    var folder = $"{version}-{ComputeContentHash(assembly, resources)}";
+    var exportPath = Path.Combine(Path.GetTempPath(), AppName, folder);
+    Directory.CreateDirectory(exportPath);
     return exportPath;
 }
 
-static void CopyRuntime(string exportPath)
+static string ComputeContentHash(Assembly assembly, string[] resources)
 {
-    var runtimePath = Path.Combine(exportPath, "runtimes", "win", "lib", "net8.0");
-    runtimePath.SafeCreate();
-
-    const string systemManagement = "System.Management.dll_";
-    var systemManagementPath = Path.Combine(runtimePath, systemManagement);
-    var fi_systemManagement = new FileInfo(systemManagementPath);
-    if (!fi_systemManagement.Exists)
+    using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+    var buffer = new byte[81920];
+    foreach (var name in resources)
     {
-        systemManagementPath = Path.Combine(exportPath, systemManagement);
-        var fi = new FileInfo(systemManagementPath);
-        fi.CopyTo(fi_systemManagement.FullName[0..^1], true);
+        hash.AppendData(Encoding.UTF8.GetBytes(name));
+        using var stream = assembly.GetManifestResourceStream(name)!;
+        int read;
+        while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            hash.AppendData(buffer, 0, read);
+        }
     }
 
-    const string systemEvents = "Microsoft.Win32.SystemEvents.dll_";
-    var systemEventsPath = Path.Combine(runtimePath, systemEvents);
-    var fi_systemEvents = new FileInfo(systemEventsPath);
-    if (!fi_systemEvents.Exists)
-    {
-        systemEventsPath = Path.Combine(exportPath, systemEvents);
-        var fi = new FileInfo(systemEventsPath);
-        fi.CopyTo(fi_systemEvents.FullName[0..^1], true);
-    }
-
-    runtimePath = Path.Combine(exportPath, "runtimes", "browser", "lib", "net8.0");
-    runtimePath.SafeCreate();
-
-    const string encodingsWeb = "System.Text.Encodings.Web.dll_";
-    var encodingsWebPath = Path.Combine(runtimePath, encodingsWeb);
-    var fi_encodingsWeb = new FileInfo(encodingsWebPath);
-    if (!fi_encodingsWeb.Exists)
-    {
-        encodingsWebPath = Path.Combine(exportPath, encodingsWeb);
-        var fi = new FileInfo(encodingsWebPath);
-        fi.CopyTo(fi_encodingsWeb.FullName[0..^1], true);
-    }
+    return Convert.ToHexString(hash.GetHashAndReset())[..12].ToLowerInvariant();
 }
 
-static void Export(string exportPath)
+static void Export(Assembly assembly, string[] resources, string exportPath)
 {
-    var assembly = Assembly.GetEntryAssembly()?.GetManifestResourceNames() ?? Enumerable.Empty<string>();
-
-    foreach (var assemblyPath in assembly)
+    var root = Path.GetFullPath(exportPath) + Path.DirectorySeparatorChar;
+    foreach (var name in resources)
     {
-        EmbeddedResourceToFile(exportPath, assemblyPath);
-    }
-}
-
-static void EmbeddedResourceToFile(string exportPath, string assemblyPath)
-{
-    byte[]? ba = null;
-    var assemblyName = assemblyPath[26..^0];
-    var filePath = new FileInfo(Path.Combine(exportPath, assemblyName));
-    if (filePath.Exists)
-    {
-        Console.WriteLine($"{assemblyName} exist.");
-#if DEBUG
-        filePath.Delete();
-#else
-            return;
-#endif
-    }
-
-    try
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        using (var stream = assembly.GetManifestResourceStream(assemblyPath)!)
+        // Resource names keep the package's relative path (see LogicalName in the csproj).
+        var relative = name[ResourcePrefix.Length..].Replace('\\', '/');
+        var target = Path.GetFullPath(Path.Combine(exportPath, relative));
+        if (!target.StartsWith(root, StringComparison.OrdinalIgnoreCase))
         {
-            ba = new byte[(int)stream.Length];
-            stream.Read(ba, 0, (int)stream.Length);
+            continue;
         }
 
-        using (var fs = new FileStream(filePath.FullName, FileMode.Create))
-        {
-            using (var bw = new BinaryWriter(fs))
-                bw.Write(ba);
-        }
-        Console.WriteLine($"Export {assemblyName} done.");
+        Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+        using var source = assembly.GetManifestResourceStream(name)!;
+        using var file = new FileStream(target, FileMode.Create, FileAccess.Write);
+        source.CopyTo(file);
+        Console.WriteLine($"Export {relative} done.");
     }
-    catch (Exception)
-    {
-        Console.WriteLine($"Export {assemblyName} failed.");
-    }
+
+    File.WriteAllText(Path.Combine(exportPath, CompleteMarker), DateTime.UtcNow.ToString("O"));
 }
 
 static void StartMemtest(string exportPath)
 {
-    RunCmd(Path.Combine(exportPath, "RunMemtest.exe"));
-}
-
-static void RunCmd(string fileName)
-{
-    var p = CreatProcess(fileName);
-    p.Start();
-}
-
-static Process CreatProcess(string fileName)
-{ 
-    return new Process()
+    var startInfo = new ProcessStartInfo
     {
-        StartInfo = new ProcessStartInfo
-        {
-            FileName = fileName,
-            Arguments = Environment.CurrentDirectory,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-        }
+        FileName = Path.Combine(exportPath, $"{AppName}.exe"),
+        UseShellExecute = false,
+        CreateNoWindow = true,
     };
-}
-
-internal static class ExtensionFunc
-{
-    internal static void SafeCreate(this string dirPath)
-    {
-        var di = new DirectoryInfo(dirPath);
-        di.SafeCreate();
-    }
-
-    static void SafeCreate(this DirectoryInfo di)
-    {
-        if (di.Exists) return;
-        di.Create();
-    }
+    // ArgumentList quotes the path, so folders with spaces stay one argument.
+    startInfo.ArgumentList.Add(Environment.CurrentDirectory);
+    Process.Start(startInfo);
 }

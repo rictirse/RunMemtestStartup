@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Release package: RunMemtest build output, copied in by the release script
+RunMemtestStartup/Package/
