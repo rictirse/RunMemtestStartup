@@ -20,14 +20,14 @@ This repository (RunMemtestStartup) contains only the launcher. The launcher car
 3. Optional: put `cpuz_x64.exe` in the same folder.
 4. Run `RunMemtestStartup.exe`. To use CPU-Z, right-click it and choose **Run as administrator**.
 5. RunMemtestPro calculates how many MemTest instances to open and how much memory each one uses, based on your free memory and CPU threads.
-6. Click **Burn** to start. Click **Stop** to end the test, then click **Clean** to clear the results.
+6. Click **Burn** to start. Click **Stop** to end the test, then click **Clear results**.
 
 ## How to Use
 
 ### Burn-in test
 - Each cell in the grid is one MemTest instance. The bar inside a cell shows its coverage; it turns darker after 100%. Hover over a cell for details.
 - A cell turns **red** when that instance reports an error or its process closes unexpectedly.
-- The burn button cycles through **Burn → Stop → Clean**. It cannot be clicked while the instances are still opening.
+- The burn button cycles through **Burn → Stop → Clear results**. It cannot be clicked while the instances are still opening.
 
 ### Memory bar
 - The bar at the bottom shows three parts: memory used by MemTest, free memory, and memory used by the system.
@@ -39,7 +39,7 @@ This repository (RunMemtestStartup) contains only the launcher. The launcher car
 - **Screenshots**: take one manually, every N minutes, or automatically when the error count exceeds a threshold (the test also stops).
 - **When the test completes**: stop at a coverage percentage or after a number of minutes, then take a screenshot, close MemTest, and optionally shut down or restart.
 - **Language** and **MemTest version** (when several versions are in the folder) can be switched.
-- **Skin**: set `"StyleName"` in `appsettings.json` to `Default`, `ROG` or `MSI`, then restart.
+- **Style (skin)**: choose `Default`, `ROG`, `ROG2`, `MSI` or `Gskill`. The change applies immediately and is saved.
 
 ### Where files are saved
 - Settings (`appsettings.json`), screenshots and logs are saved in the folder where `RunMemtestStartup.exe` is.
@@ -101,7 +101,7 @@ RunMemtestPro reads memory information in two ways. The current source is shown 
 - **截圖**：可以手動截圖、每 N 分鐘自動截圖，或錯誤數超過門檻時自動截圖，同時停止燒機。
 - **測試完成時**：達到指定的覆蓋率或分鐘數時停止，然後截圖、關閉 MemTest，也可以設定關機或重開機。
 - 可以切換**語言**；資料夾裡有多個 MemTest 版本時，也可以切換 **MemTest 版本**。
-- **外觀**：在 `appsettings.json` 把 `"StyleName"` 設成 `Default`、`ROG` 或 `MSI`，重新啟動後生效。
+- **外觀（Style）**：可選 `Default`、`ROG`、`ROG2`、`MSI`、`Gskill`，選了馬上套用並自動存檔。
 
 ### 檔案存在哪裡
 - 設定（`appsettings.json`）、截圖和 Log 都存在 `RunMemtestStartup.exe` 所在的資料夾。
