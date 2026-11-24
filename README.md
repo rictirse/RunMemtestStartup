@@ -1,6 +1,6 @@
 # RunMemtestPro
 
-![RunMemtestPro](docs/cover.png)
+![RunMemtestPro](docs/cover-msi.png)
 
 **English** | [中文](#中文)
 
